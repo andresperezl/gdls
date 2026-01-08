@@ -1,0 +1,139 @@
+{
+  "name": "gdls-language-support",
+  "displayName": "Godot Language Server",
+  "description": "Language support for Godot Text Scene (.tscn), External Scene (.escn), and Shader (.gdshader) files",
+  "version": "0.1.0",
+  "publisher": "gdls",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andresperezl/gdls"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Formatters"
+  ],
+  "keywords": [
+    "godot",
+    "tscn",
+    "escn",
+    "gdshader",
+    "shader",
+    "game development",
+    "language server"
+  ],
+  "activationEvents": [
+    "onLanguage:tscn",
+    "onLanguage:gdshader"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "tscn",
+        "aliases": [
+          "Godot Text Scene",
+          "TSCN"
+        ],
+        "extensions": [
+          ".tscn",
+          ".escn"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/tscn-light.svg",
+          "dark": "./icons/tscn-dark.svg"
+        }
+      },
+      {
+        "id": "gdshader",
+        "aliases": [
+          "Godot Shader",
+          "GDShader"
+        ],
+        "extensions": [
+          ".gdshader",
+          ".gdshaderinc"
+        ],
+        "configuration": "./gdshader-language-configuration.json",
+        "icon": {
+          "light": "./icons/gdshader-light.svg",
+          "dark": "./icons/gdshader-dark.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "tscn",
+        "scopeName": "source.tscn",
+        "path": "./syntaxes/tscn.tmLanguage.json"
+      },
+      {
+        "language": "gdshader",
+        "scopeName": "source.gdshader",
+        "path": "./syntaxes/gdshader.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Godot Language Server",
+      "properties": {
+        "gdls.server.path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the gdls executable. Leave empty to use the bundled binary or search in PATH."
+        },
+        "gdls.server.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the Godot language server."
+        },
+        "gdls.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "gdls.restartServer",
+        "title": "Godot: Restart Language Server"
+      },
+      {
+        "command": "gdls.showOutputChannel",
+        "title": "Godot: Show Output Channel"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "compile:tsc": "tsc -p ./",
+    "watch": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
+    "lint": "biome check src/",
+    "lint:fix": "biome check --write src/",
+    "format": "biome format --write src/",
+    "package": "bun run compile && vsce package --no-dependencies",
+    "publish": "bun run compile && vsce publish"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^2.22.0",
+    "esbuild": "^0.27.2",
+    "typescript": "^5.3.0"
+  }
+}

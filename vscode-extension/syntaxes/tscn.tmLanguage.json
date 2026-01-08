@@ -1,0 +1,173 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Godot Text Scene",
+  "scopeName": "source.tscn",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#section-header" },
+    { "include": "#property" }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.semicolon.tscn",
+      "match": ";.*$"
+    },
+    "section-header": {
+      "name": "meta.section.tscn",
+      "begin": "^\\[",
+      "end": "\\]",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.section.begin.tscn" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.section.end.tscn" }
+      },
+      "patterns": [
+        { "include": "#section-keyword" },
+        { "include": "#section-parameter" }
+      ]
+    },
+    "section-keyword": {
+      "name": "keyword.control.section.tscn",
+      "match": "\\b(gd_scene|gd_resource|ext_resource|sub_resource|node|connection|resource)\\b"
+    },
+    "section-parameter": {
+      "patterns": [
+        {
+          "match": "\\b(type|name|parent|instance|index|id|path|uid|signal|from|to|method|format|load_steps|script)\\s*(=)",
+          "captures": {
+            "1": { "name": "variable.parameter.tscn" },
+            "2": { "name": "keyword.operator.assignment.tscn" }
+          }
+        },
+        { "include": "#string" },
+        { "include": "#number" }
+      ]
+    },
+    "property": {
+      "begin": "^([a-zA-Z_][a-zA-Z0-9_/]*)\\s*(=)\\s*",
+      "beginCaptures": {
+        "1": { "name": "variable.other.property.tscn" },
+        "2": { "name": "keyword.operator.assignment.tscn" }
+      },
+      "end": "$",
+      "patterns": [
+        { "include": "#value" }
+      ]
+    },
+    "value": {
+      "patterns": [
+        { "include": "#type-constructor" },
+        { "include": "#resource-reference" },
+        { "include": "#string" },
+        { "include": "#number" },
+        { "include": "#boolean" },
+        { "include": "#null" },
+        { "include": "#array" },
+        { "include": "#dictionary" }
+      ]
+    },
+    "type-constructor": {
+      "begin": "\\b([A-Z][a-zA-Z0-9_]*)\\s*\\(",
+      "beginCaptures": {
+        "1": { "name": "support.type.tscn" }
+      },
+      "end": "\\)",
+      "patterns": [
+        { "include": "#value" },
+        {
+          "match": ",",
+          "name": "punctuation.separator.tscn"
+        }
+      ]
+    },
+    "resource-reference": {
+      "begin": "\\b(ExtResource|SubResource)\\s*\\(",
+      "beginCaptures": {
+        "1": { "name": "support.function.tscn" }
+      },
+      "end": "\\)",
+      "patterns": [
+        { "include": "#string" }
+      ]
+    },
+    "string": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.tscn",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.tscn",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "number": {
+      "patterns": [
+        {
+          "name": "constant.numeric.float.tscn",
+          "match": "-?\\d+\\.\\d+([eE][+-]?\\d+)?"
+        },
+        {
+          "name": "constant.numeric.integer.tscn",
+          "match": "-?\\d+"
+        },
+        {
+          "name": "constant.numeric.hex.tscn",
+          "match": "0x[0-9a-fA-F]+"
+        }
+      ]
+    },
+    "boolean": {
+      "name": "constant.language.boolean.tscn",
+      "match": "\\b(true|false)\\b"
+    },
+    "null": {
+      "name": "constant.language.null.tscn",
+      "match": "\\bnull\\b"
+    },
+    "array": {
+      "begin": "\\[",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.array.begin.tscn" }
+      },
+      "end": "\\]",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.array.end.tscn" }
+      },
+      "patterns": [
+        { "include": "#value" },
+        {
+          "match": ",",
+          "name": "punctuation.separator.tscn"
+        }
+      ]
+    },
+    "dictionary": {
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.dictionary.begin.tscn" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.dictionary.end.tscn" }
+      },
+      "patterns": [
+        { "include": "#string" },
+        { "include": "#value" },
+        {
+          "match": ":",
+          "name": "punctuation.separator.key-value.tscn"
+        },
+        {
+          "match": ",",
+          "name": "punctuation.separator.tscn"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3]
+
+; This file has intentional errors for testing diagnostics
+
+[ext_resource type="Script" path="res://script.gd" id="1_valid"]
+
+[sub_resource type="BoxShape3D" id="BoxShape_123"]
+size = Vector3(1, 1, 1)
+
+[node name="Root" type="Node3D"]
+; Reference to non-existent resource
+broken_ref = ExtResource("nonexistent_id")
+
+[node name="Child" type="Node3D" parent="."]
+; Reference to valid sub-resource
+shape = SubResource("BoxShape_123")
+
+[node name="Orphan" type="Node3D" parent="NonExistentParent"]
+; This node has an invalid parent path

@@ -1,0 +1,45 @@
+# Binaries
+gdls
+!cmd/gdls
+gdls.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Build output
+dist/
+
+# Test artifacts
+coverage.out
+coverage.html
+*.test
+
+# Go workspace
+go.work
+go.work.sum
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode extension (also has its own .gitignore)
+vscode-extension/out/
+vscode-extension/node_modules/
+vscode-extension/*.vsix
+vscode-extension/.vscode-test/
+vscode-extension/bin/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local

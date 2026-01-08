@@ -1,0 +1,71 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - bodyclose
+    - errcheck
+    - gocritic
+    - misspell
+    - staticcheck
+    - unconvert
+    - unused
+
+  settings:
+    gocritic:
+      disabled-checks:
+        # These are too noisy for this codebase
+        - ifElseChain
+        - singleCaseSwitch
+        - elseif
+
+    errcheck:
+      # Don't check for errors on Close() calls in defers
+      exclude-functions:
+        - (*os.File).Close
+        - (io.Closer).Close
+
+  exclusions:
+    generated: lax
+    rules:
+      # Ignore errcheck in test files for cleanup functions
+      - linters:
+          - errcheck
+        path: _test\.go
+        text: "Error return value of .*(Close|shutdown|exit).*is not checked"
+      # Ignore noctx in tests
+      - linters:
+          - noctx
+        path: _test\.go
+      # Ignore unused/unparam in tests
+      - linters:
+          - unused
+          - unparam
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/andresperezl/gdls
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

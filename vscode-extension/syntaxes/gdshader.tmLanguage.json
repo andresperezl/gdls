@@ -1,0 +1,263 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Godot Shader",
+  "scopeName": "source.gdshader",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#shader-declaration" },
+    { "include": "#render-mode" },
+    { "include": "#preprocessor" },
+    { "include": "#storage" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#constants" },
+    { "include": "#functions" },
+    { "include": "#operators" },
+    { "include": "#numbers" },
+    { "include": "#strings" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.documentation.gdshader",
+          "begin": "/\\*\\*",
+          "end": "\\*/",
+          "captures": {
+            "0": { "name": "punctuation.definition.comment.gdshader" }
+          }
+        },
+        {
+          "name": "comment.block.gdshader",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "captures": {
+            "0": { "name": "punctuation.definition.comment.gdshader" }
+          }
+        },
+        {
+          "name": "comment.line.double-slash.gdshader",
+          "match": "//.*$"
+        }
+      ]
+    },
+    "shader-declaration": {
+      "match": "\\b(shader_type)\\s+(spatial|canvas_item|particles|sky|fog)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.shader-type.gdshader" },
+        "2": { "name": "entity.name.type.shader.gdshader" }
+      }
+    },
+    "render-mode": {
+      "begin": "\\b(render_mode)\\b",
+      "end": ";",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.render-mode.gdshader" }
+      },
+      "patterns": [
+        {
+          "name": "entity.name.tag.render-mode.gdshader",
+          "match": "\\b(unshaded|light_only|skip_vertex_transform|world_vertex_coords|ensure_correct_normals|shadows_disabled|ambient_light_disabled|shadow_to_opacity|vertex_lighting|particle_trails|alpha_to_coverage|alpha_to_coverage_and_one|blend_mix|blend_add|blend_sub|blend_mul|blend_premul_alpha|depth_draw_opaque|depth_draw_always|depth_draw_never|depth_prepass_alpha|depth_test_disabled|sss_mode_skin|cull_front|cull_back|cull_disabled|fog_disabled|specular_schlick_ggx|specular_toon|specular_disabled|diffuse_burley|diffuse_lambert|diffuse_lambert_wrap|diffuse_toon|disable_ambient_light|disable_fog|use_physical_light_units|light_projector|light_texture|use_alpha|screen_uv_used|depth_texture_used|normal_roughness_texture_used)\\b"
+        },
+        {
+          "name": "punctuation.separator.comma.gdshader",
+          "match": ","
+        }
+      ]
+    },
+    "preprocessor": {
+      "patterns": [
+        {
+          "name": "meta.preprocessor.include.gdshader",
+          "match": "^\\s*(#include)\\s+\"([^\"]+)\"",
+          "captures": {
+            "1": { "name": "keyword.control.directive.include.gdshader" },
+            "2": { "name": "string.quoted.double.include.gdshader" }
+          }
+        },
+        {
+          "name": "meta.preprocessor.define.gdshader",
+          "match": "^\\s*(#define)\\s+(\\w+)",
+          "captures": {
+            "1": { "name": "keyword.control.directive.define.gdshader" },
+            "2": { "name": "entity.name.constant.preprocessor.gdshader" }
+          }
+        },
+        {
+          "name": "keyword.control.directive.gdshader",
+          "match": "^\\s*#(if|ifdef|ifndef|elif|else|endif|undef)\\b"
+        }
+      ]
+    },
+    "storage": {
+      "patterns": [
+        {
+          "name": "storage.modifier.gdshader",
+          "match": "\\b(uniform|varying|const|in|out|inout|flat|smooth|lowp|mediump|highp|global|group_uniforms|instance)\\b"
+        },
+        {
+          "name": "storage.type.struct.gdshader",
+          "match": "\\b(struct)\\b"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.gdshader",
+          "match": "\\b(if|else|for|while|do|switch|case|default|break|continue|return|discard)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.gdshader",
+          "match": "\\b(void|bool|int|uint|float)\\b"
+        },
+        {
+          "name": "storage.type.vector.gdshader",
+          "match": "\\b(vec2|vec3|vec4|ivec2|ivec3|ivec4|uvec2|uvec3|uvec4|bvec2|bvec3|bvec4)\\b"
+        },
+        {
+          "name": "storage.type.matrix.gdshader",
+          "match": "\\b(mat2|mat3|mat4)\\b"
+        },
+        {
+          "name": "storage.type.sampler.gdshader",
+          "match": "\\b(sampler2D|sampler2DArray|sampler3D|samplerCube|samplerCubeArray|samplerExternalOES|isampler2D|isampler2DArray|isampler3D|usampler2D|usampler2DArray|usampler3D)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.gdshader",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.language.gdshader",
+          "match": "\\b(PI|TAU|E)\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "entity.name.function.builtin.gdshader",
+          "match": "\\b(radians|degrees|sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|asinh|acosh|atanh|pow|exp|exp2|log|log2|sqrt|inversesqrt|abs|sign|floor|ceil|round|roundEven|trunc|fract|mod|min|max|clamp|mix|step|smoothstep|length|distance|dot|cross|normalize|reflect|refract|faceforward|matrixCompMult|transpose|inverse|determinant|outerProduct|texture|textureSize|textureLod|textureProj|texelFetch|textureGrad|dFdx|dFdy|fwidth|lessThan|greaterThan|lessThanEqual|greaterThanEqual|equal|notEqual|any|all|not|floatBitsToInt|floatBitsToUint|intBitsToFloat|uintBitsToFloat|packHalf2x16|unpackHalf2x16|packUnorm2x16|unpackUnorm2x16|packSnorm2x16|unpackSnorm2x16|isnan|isinf)\\b(?=\\s*\\()"
+        },
+        {
+          "name": "entity.name.function.stage.gdshader",
+          "match": "\\b(vertex|fragment|light|start|process|sky|fog)\\b(?=\\s*\\()"
+        },
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": { "name": "entity.name.function.gdshader" }
+          }
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.assignment.gdshader",
+          "match": "(\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|<<=|>>=|=)"
+        },
+        {
+          "name": "keyword.operator.comparison.gdshader",
+          "match": "(==|!=|<=|>=|<|>)"
+        },
+        {
+          "name": "keyword.operator.logical.gdshader",
+          "match": "(\\&\\&|\\|\\||!)"
+        },
+        {
+          "name": "keyword.operator.bitwise.gdshader",
+          "match": "(\\&|\\||\\^|~|<<|>>)"
+        },
+        {
+          "name": "keyword.operator.arithmetic.gdshader",
+          "match": "(\\+|-|\\*|/|%)"
+        },
+        {
+          "name": "keyword.operator.increment-decrement.gdshader",
+          "match": "(\\+\\+|--)"
+        },
+        {
+          "name": "keyword.operator.ternary.gdshader",
+          "match": "(\\?|:)"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.gdshader",
+          "match": "\\b0[xX][0-9a-fA-F]+[uU]?\\b"
+        },
+        {
+          "name": "constant.numeric.float.gdshader",
+          "match": "\\b[0-9]+\\.[0-9]*([eE][+-]?[0-9]+)?[fF]?\\b|\\b\\.[0-9]+([eE][+-]?[0-9]+)?[fF]?\\b|\\b[0-9]+[eE][+-]?[0-9]+[fF]?\\b|\\b[0-9]+\\.[fF]?\\b"
+        },
+        {
+          "name": "constant.numeric.integer.gdshader",
+          "match": "\\b[0-9]+[uU]?\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.gdshader",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.gdshader",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.terminator.statement.gdshader",
+          "match": ";"
+        },
+        {
+          "name": "punctuation.separator.comma.gdshader",
+          "match": ","
+        },
+        {
+          "name": "punctuation.section.parens.begin.gdshader",
+          "match": "\\("
+        },
+        {
+          "name": "punctuation.section.parens.end.gdshader",
+          "match": "\\)"
+        },
+        {
+          "name": "punctuation.section.braces.begin.gdshader",
+          "match": "\\{"
+        },
+        {
+          "name": "punctuation.section.braces.end.gdshader",
+          "match": "\\}"
+        },
+        {
+          "name": "punctuation.section.brackets.begin.gdshader",
+          "match": "\\["
+        },
+        {
+          "name": "punctuation.section.brackets.end.gdshader",
+          "match": "\\]"
+        },
+        {
+          "name": "punctuation.accessor.gdshader",
+          "match": "\\."
+        }
+      ]
+    }
+  }
+}

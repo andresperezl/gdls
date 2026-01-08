@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  conventional-commits:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR title
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          requireScope: false
+          subjectPattern: ^[a-z].+$
+          subjectPatternError: |
+            The subject "{subject}" doesn't match the required pattern.
+            Subject must start with a lowercase letter.
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+
+      - name: Setup Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Run tests
+        run: task test
+
+      - name: Run vet
+        run: task vet
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
+
+  build:
+    name: Build (${{ matrix.os }}-${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+          - os: linux
+            arch: arm64
+          - os: darwin
+            arch: amd64
+          - os: darwin
+            arch: arm64
+          - os: windows
+            arch: amd64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: "0"
+        run: |
+          ext=""
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            ext=".exe"
+          fi
+          go build -ldflags "-s -w" -o gdls${ext} ./cmd/gdls
+
+  extension:
+    name: VSCode Extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: vscode-extension
+        run: bun install
+
+      - name: Lint with Biome
+        working-directory: vscode-extension
+        run: bun run lint
+
+      - name: Compile
+        working-directory: vscode-extension
+        run: bun run compile

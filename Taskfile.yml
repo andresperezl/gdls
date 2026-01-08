@@ -1,0 +1,184 @@
+version: '3'
+
+vars:
+  BINARY_NAME: gdls
+  VERSION:
+    sh: git describe --tags --always --dirty 2>/dev/null || echo "dev"
+  COMMIT:
+    sh: git rev-parse --short HEAD 2>/dev/null || echo "unknown"
+  BUILD_TIME:
+    sh: date -u '+%Y-%m-%dT%H:%M:%SZ'
+  LDFLAGS: -s -w -X main.version={{.VERSION}} -X main.commit={{.COMMIT}} -X main.buildTime={{.BUILD_TIME}}
+
+env:
+  CGO_ENABLED: '0'
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  build:
+    desc: Build for current platform
+    cmds:
+      - go build -ldflags "{{.LDFLAGS}}" -o {{.BINARY_NAME}} ./cmd/gdls
+
+  install:
+    desc: Install to $GOPATH/bin
+    cmds:
+      - go install -ldflags "{{.LDFLAGS}}" ./cmd/gdls
+
+  test:
+    desc: Run all tests
+    cmds:
+      - go test -v ./...
+
+  test:unit:
+    desc: Run unit tests only
+    cmds:
+      - go test -v ./internal/...
+
+  test:e2e:
+    desc: Run E2E tests
+    cmds:
+      - go test -v ./test/e2e/...
+
+  test:coverage:
+    desc: Run tests with coverage
+    cmds:
+      - go test -coverprofile=coverage.out -covermode=atomic ./...
+      - go tool cover -html=coverage.out -o coverage.html
+
+  lint:
+    desc: Run linter
+    cmds:
+      - golangci-lint run ./...
+
+  fmt:
+    desc: Format code
+    cmds:
+      - go fmt ./...
+      - goimports -w .
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -f {{.BINARY_NAME}}
+      - rm -f coverage.out coverage.html
+      - rm -rf dist/
+      - rm -rf vscode-extension/bin/
+      - rm -rf vscode-extension/out/
+      - rm -f vscode-extension/*.vsix
+
+  clean:all:
+    desc: Clean everything (build artifacts, caches, dependencies)
+    cmds:
+      - task: clean
+      - go clean -cache -testcache
+      - rm -rf vscode-extension/node_modules/
+
+  # Cross-compilation tasks
+  build:linux-amd64:
+    desc: Build for Linux AMD64
+    env:
+      GOOS: linux
+      GOARCH: amd64
+    cmds:
+      - mkdir -p dist/{{.BINARY_NAME}}-linux-amd64
+      - go build -ldflags "{{.LDFLAGS}}" -o dist/{{.BINARY_NAME}}-linux-amd64/{{.BINARY_NAME}} ./cmd/gdls
+
+  build:linux-arm64:
+    desc: Build for Linux ARM64
+    env:
+      GOOS: linux
+      GOARCH: arm64
+    cmds:
+      - mkdir -p dist/{{.BINARY_NAME}}-linux-arm64
+      - go build -ldflags "{{.LDFLAGS}}" -o dist/{{.BINARY_NAME}}-linux-arm64/{{.BINARY_NAME}} ./cmd/gdls
+
+  build:darwin-amd64:
+    desc: Build for macOS AMD64
+    env:
+      GOOS: darwin
+      GOARCH: amd64
+    cmds:
+      - mkdir -p dist/{{.BINARY_NAME}}-darwin-amd64
+      - go build -ldflags "{{.LDFLAGS}}" -o dist/{{.BINARY_NAME}}-darwin-amd64/{{.BINARY_NAME}} ./cmd/gdls
+
+  build:darwin-arm64:
+    desc: Build for macOS ARM64
+    env:
+      GOOS: darwin
+      GOARCH: arm64
+    cmds:
+      - mkdir -p dist/{{.BINARY_NAME}}-darwin-arm64
+      - go build -ldflags "{{.LDFLAGS}}" -o dist/{{.BINARY_NAME}}-darwin-arm64/{{.BINARY_NAME}} ./cmd/gdls
+
+  build:windows-amd64:
+    desc: Build for Windows AMD64
+    env:
+      GOOS: windows
+      GOARCH: amd64
+    cmds:
+      - mkdir -p dist/{{.BINARY_NAME}}-windows-amd64
+      - go build -ldflags "{{.LDFLAGS}}" -o dist/{{.BINARY_NAME}}-windows-amd64/{{.BINARY_NAME}}.exe ./cmd/gdls
+
+  build:all:
+    desc: Build for all platforms
+    deps:
+      - build:linux-amd64
+      - build:linux-arm64
+      - build:darwin-amd64
+      - build:darwin-arm64
+      - build:windows-amd64
+
+  # VSCode extension tasks
+  vscode:install:
+    desc: Install VSCode extension dependencies
+    dir: vscode-extension
+    cmds:
+      - bun install
+
+  vscode:compile:
+    desc: Compile VSCode extension
+    dir: vscode-extension
+    cmds:
+      - bun run compile
+
+  vscode:lint:
+    desc: Lint VSCode extension
+    dir: vscode-extension
+    cmds:
+      - bun run lint
+
+  vscode:package:
+    desc: Package VSCode extension
+    dir: vscode-extension
+    cmds:
+      - bun run package
+
+  # Release preparation
+  release:prepare-binaries:
+    desc: Copy binaries to VSCode extension bin folder
+    cmds:
+      - mkdir -p vscode-extension/bin
+      - cp dist/{{.BINARY_NAME}}-linux-amd64/{{.BINARY_NAME}} vscode-extension/bin/{{.BINARY_NAME}}-linux-amd64
+      - cp dist/{{.BINARY_NAME}}-linux-arm64/{{.BINARY_NAME}} vscode-extension/bin/{{.BINARY_NAME}}-linux-arm64
+      - cp dist/{{.BINARY_NAME}}-darwin-amd64/{{.BINARY_NAME}} vscode-extension/bin/{{.BINARY_NAME}}-darwin-amd64
+      - cp dist/{{.BINARY_NAME}}-darwin-arm64/{{.BINARY_NAME}} vscode-extension/bin/{{.BINARY_NAME}}-darwin-arm64
+      - cp dist/{{.BINARY_NAME}}-windows-amd64/{{.BINARY_NAME}}.exe vscode-extension/bin/{{.BINARY_NAME}}-windows-amd64.exe
+
+  release:extension:
+    desc: Build extension with bundled binaries
+    deps:
+      - build:all
+      - release:prepare-binaries
+      - vscode:install
+    cmds:
+      - task: vscode:package
