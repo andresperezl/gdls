@@ -2,7 +2,7 @@
   "name": "gdls-language-support",
   "displayName": "Godot Language Server",
   "description": "Language support for Godot Text Scene (.tscn), External Scene (.escn), and Shader (.gdshader) files",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "gdls",
   "license": "MIT",
   "repository": {
