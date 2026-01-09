@@ -1,6 +1,15 @@
-# Godot Language Server (GDLS)
+# Godot Language Server (GDLS) - VS Code Extension
 
 Language support for Godot Text Scene (`.tscn`), External Scene (`.escn`), and Shader (`.gdshader`) files.
+
+## Installation
+
+### From VSIX File
+
+1. Download the `.vsix` file from [GitHub Releases](https://github.com/andresperezl/gdls/releases)
+2. In VS Code, open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+3. Run `Extensions: Install from VSIX...`
+4. Select the downloaded `.vsix` file
 
 ## Features
 
@@ -17,24 +26,36 @@ Language support for Godot Text Scene (`.tscn`), External Scene (`.escn`), and S
 
 ## Requirements
 
-The extension requires the `gdls` language server binary. You can:
+The extension requires the `gdls` language server binary. Choose one of the following options:
 
-1. **Use the bundled binary** (if included in the extension)
-2. **Install globally** and ensure `gdls` is in your PATH
-3. **Configure a custom path** via the `gdls.server.path` setting
+### Option 1: Use Bundled Binary (Recommended)
 
-### Building the Language Server
+If the extension includes a bundled binary for your platform, it will be used automatically. No additional setup required.
+
+### Option 2: Install via Go
+
+If you have Go 1.25+ installed:
 
 ```bash
-# Clone the gdls repository
-git clone https://github.com/andresperezl/gdls.git
-cd gdls
+go install github.com/andresperezl/gdls/cmd/gdls@latest
+```
 
-# Build for your platform
-go build -o gdls ./cmd/gdls
+Ensure `$GOPATH/bin` (typically `$HOME/go/bin`) is in your PATH.
 
-# Optionally, move to a directory in your PATH
-mv gdls ~/.local/bin/
+### Option 3: Download from Releases
+
+Download the appropriate binary for your platform from [GitHub Releases](https://github.com/andresperezl/gdls/releases) and either:
+- Place it in a directory in your PATH, or
+- Configure the path via the `gdls.server.path` setting (see below)
+
+### Option 4: Configure Custom Path
+
+If you have `gdls` installed in a custom location, configure it in VS Code settings:
+
+```json
+{
+  "gdls.server.path": "/path/to/gdls"
+}
 ```
 
 ## Extension Settings
@@ -58,22 +79,23 @@ mv gdls ~/.local/bin/
 - `.escn` - External Scene files
 - `.gdshader` - Godot Shader files
 
-## Development
+## Troubleshooting
 
-```bash
-# Install dependencies
-cd vscode-extension
-npm install
+### Language server not starting
 
-# Compile
-npm run compile
+1. Check that `gdls` is installed and accessible:
+   ```bash
+   gdls --version
+   ```
+2. If using a custom path, verify the `gdls.server.path` setting points to the correct location
+3. Check the output channel (`Godot: Show Output Channel`) for error messages
+4. Enable tracing (`gdls.trace.server`: `"verbose"`) for detailed logs
 
-# Watch for changes
-npm run watch
+### Features not working
 
-# Package the extension
-npm run package
-```
+1. Ensure the file has the correct extension (`.tscn`, `.escn`, or `.gdshader`)
+2. Try restarting the language server (`Godot: Restart Language Server`)
+3. Check for errors in the Problems panel
 
 ## License
 
